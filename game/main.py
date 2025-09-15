@@ -1,6 +1,8 @@
 import pygame as pg
 from pygame.locals import * 
 
+from sprite_renderer import carregar_textura, desenhar_sprite
+
 from OpenGL.GL import *
 
 pg.init()
@@ -25,6 +27,12 @@ glOrtho(0, screen_width, screen_height, 0, -1, 1)
 glMatrixMode(GL_MODELVIEW)
 glLoadIdentity()
 
+#carregar as texturas 
+personagem_textura_id, largura_personagem, altura_personagem = carregar_textura(r"C:\Users\caiol\Documents\caio\FACULDADE\sistmult\seminario 1ee PARTE 2\seminario-pyopengl\game\assets_\sprites\red-lgpe.png")
+
+#posição inicial
+personagem_x, personagem_y = 100, 50
+
 #loop de jogo
 running = True
 while running:
@@ -34,7 +42,7 @@ while running:
             running = False
 
     glClear(GL_COLOR_BUFFER_BIT)
-
+    desenhar_sprite(personagem_textura_id, personagem_x, personagem_y, largura_personagem, altura_personagem) 
     pg.display.flip()
 
 pg.quit()
