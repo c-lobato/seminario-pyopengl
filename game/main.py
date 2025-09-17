@@ -3,6 +3,18 @@ from pygame.locals import *
 from OpenGL.GL import *
 from sprite_renderer import carregar_textura, desenhar_sprite
 
+#variáveis de renderização
+TILE_SIZE = 16
+ESCALA = 2
+
+#função que inicializa o tileset do mapa
+def carregar_mapa(caminho_mapa):
+    mapa = []
+    with open(caminho_mapa, 'r') as f:
+        for linha in f.readlines():
+            mapa.append([int(i) for i in linha.split()])
+    return mapa
+
 pg.init()
 
 # configura as dimensões da janela e o título
@@ -29,9 +41,11 @@ glLoadIdentity()
 glEnable(GL_BLEND)
 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-# carrega a textura e pega as dimensões da imagem
-# SUBSTITUA O CAMINHO ABAIXO PELO CAMINHO CORRETO DA SUA SPRITE SHEET
-personagem_textura_id, sheet_width, sheet_height = carregar_textura(r"C:\Users\caiol\Documents\caio\FACULDADE\sistmult\seminario 1ee PARTE 2\seminario-pyopengl\game\assets_\sprites\red\idle_front.png")
+# loading das texturas do personagem e do mapa
+personagem_textura_id, largura_personagem, altura_personagem = carregar_textura(r"C:\Users\caiol\Documents\caio\FACULDADE\sistmult\seminario 1ee PARTE 2\seminario-pyopengl\game\assets_\sprites\red\idle_front.png")
+
+tileset_id, tileset_largura, tileset_altura = carregar_textura(r"C:\Users\caiol\Documents\caio\FACULDADE\sistmult\seminario 1ee PARTE 2\seminario-pyopengl\game\assets_\maps\mapa_generico.png")
+mapa_data = carregar_mapa(r"C:\Users\caiol\Documents\caio\FACULDADE\sistmult\seminario 1ee PARTE 2\seminario-pyopengl\game\assets_\maps\mapa.txt")
 
 # define a posição inicial do personagem e as dimensões de exibição
 personagem_x, personagem_y = 100, 100
@@ -60,13 +74,29 @@ while running:
 
     # renderização OpenGL
     glClear(GL_COLOR_BUFFER_BIT)
-    
+
+    #renderização e desenho do mapa
+    for y_tile, linha in enumerate(mapa_data):
+        for x_tile, tile_id in enumerate(linha):
+            # calcula as coordenadas do tile no tileset
+            tileset_colunas = tileset_largura // TILE_SIZE
+            tex_x = (tile_id % tileset_colunas) * TILE_SIZE / tileset_largura
+            tex_y = (tile_id // tileset_colunas) * TILE_SIZE / tileset_altura
+
+            # desenha o tile
+            desenhar_sprite(tileset_id, 
+                            x_tile * TILE_SIZE * ESCALA, 
+                            y_tile * TILE_SIZE * ESCALA, 
+                            TILE_SIZE * ESCALA, TILE_SIZE * ESCALA,
+                            tex_x, tex_y,
+                            TILE_SIZE / tileset_largura, TILE_SIZE / tileset_altura)
+        
     # desenha o personagem
-    desenhar_sprite(personagem_textura_id, personagem_x, personagem_y, largura_personagem, altura_personagem)
+    desenhar_sprite(personagem_textura_id, personagem_x, personagem_y, largura_personagem * ESCALA, altura_personagem * ESCALA, 0.0, 0.0, 1.0, 1.0)
     # atualiza a tela
     pg.display.flip()
 
     relogio.tick(60) #limita os frames para 60 fps
     
-# finaliza o Pygame
+# inicializa o Pygame
 pg.quit()
