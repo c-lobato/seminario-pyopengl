@@ -19,26 +19,27 @@ def carregar_textura(caminho_imagem):
 
     return textura_id, img.width, img.height
 
-def desenhar_sprite(textura_id, x, y, largura, altura):
-    """
-    Desenha um sprite na tela nas coordenadas especificadas.
-    """
+def desenhar_sprite(textura_id, x, y, largura, altura, tex_x, tex_y, tex_largura, tex_altura):
+
     glEnable(GL_TEXTURE_2D)
     glBindTexture(GL_TEXTURE_2D, textura_id)
 
-    glBegin(GL_QUADS)
+    glBegin(GL_QUADS)     #cria o quadrado onde "colaremos" todas as texturas por cima
     
-    # As coordenadas de textura agora cobrem a imagem inteira
-    glTexCoord2f(0.0, 0.0)
+    #canto superior esquerdo da figura 
+    glTexCoord2f(tex_x, tex_y)
     glVertex2f(x, y)
     
-    glTexCoord2f(1.0, 0.0)
+    #canto superior direito 
+    glTexCoord2f(tex_x + tex_largura, tex_y)
     glVertex2f(x + largura, y)
     
-    glTexCoord2f(1.0, 1.0)
+    #canto inferior direito
+    glTexCoord2f(tex_x + tex_largura, tex_y + tex_altura)
     glVertex2f(x + largura, y + altura)
     
-    glTexCoord2f(0.0, 1.0)
+    #canto inferior esquerdo
+    glTexCoord2f(tex_x, tex_y + tex_altura)
     glVertex2f(x, y + altura)
 
     glEnd()
