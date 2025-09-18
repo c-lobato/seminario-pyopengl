@@ -1,7 +1,8 @@
 import pygame as pg
 from pygame.locals import *
 from OpenGL.GL import *
-from sprite_renderer import carregar_textura, desenhar_sprite
+from sprite_renderer import * 
+from character import Character
 
 #variáveis de renderização
 TILE_SIZE = 16
@@ -15,10 +16,15 @@ def carregar_mapa(caminho_mapa):
             mapa.append([int(i) for i in linha.split()])
     return mapa
 
+mapeamento_tiles = {
+    0: 13,  # ID do tile de grama no tileset
+    1: 14,  # ID do tile de montanha no tileset
+}
+
+#inicialização do pygame
 pg.init()
 
-personagem_x, personagem_y = 100, 100
-velocidade_personagem= 2
+#cria o contador de frames do jogo
 relogio = pg.time.Clock()
 
 # configura as dimensões da janela e o título
@@ -51,9 +57,8 @@ personagem_textura_id, largura_personagem, altura_personagem = carregar_textura(
 tileset_id, tileset_largura, tileset_altura = carregar_textura(r"C:\Users\caiol\Documents\caio\FACULDADE\sistmult\seminario 1ee PARTE 2\seminario-pyopengl\game\assets_\maps\mapa_generico.png")
 mapa_data = carregar_mapa(r"C:\Users\caiol\Documents\caio\FACULDADE\sistmult\seminario 1ee PARTE 2\seminario-pyopengl\game\assets_\maps\mapa.txt")
 
-# define a posição inicial do personagem e as dimensões de exibição
-
-
+#instanciação do personagem
+char = Character(personagem_textura_id, 380, 200, largura_personagem, altura_personagem, velocidade = 16 * ESCALA // 8, tile_size = TILE_SIZE, escala = ESCALA)
 
 # loop principal do jogo
 running = True
@@ -63,16 +68,9 @@ while running:
         if event.type == pg.QUIT:
             running = False
 
-    #logica do teclado
+    #logica do teclado/movimentação
     teclas = pg.key.get_pressed()
-    if teclas[pg.K_w]:
-        personagem_y -= velocidade_personagem
-    if teclas[pg.K_a]:
-        personagem_x -= velocidade_personagem
-    if teclas[pg.K_d]:
-        personagem_x += velocidade_personagem
-    if teclas[pg.K_s]:
-        personagem_y += velocidade_personagem
+    char.update_char(teclas)
 
     # renderização OpenGL
     glClear(GL_COLOR_BUFFER_BIT)
@@ -94,10 +92,11 @@ while running:
                             TILE_SIZE / tileset_largura, TILE_SIZE / tileset_altura)
         
     # desenha o personagem
-    desenhar_sprite(personagem_textura_id, personagem_x, personagem_y, largura_personagem * ESCALA, altura_personagem * ESCALA, 0.0, 0.0, 1.0, 1.0)
+    char.draw_char(desenhar_sprite, ESCALA)
     # atualiza a tela
     pg.display.flip()
 
+    #tickrate do game
     relogio.tick(60) #limita os frames para 60 fps
     
 # inicializa o Pygame

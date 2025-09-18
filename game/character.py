@@ -2,7 +2,7 @@ import pygame as pg
 
 from sprite_renderer import desenhar_sprite
 
-Class Character: 
+class Character: 
     def __init__(self, sprite_id, x,y, width, height, velocidade, tile_size, escala):
         self.sprite_id = sprite_id
         self.x = x
@@ -53,8 +53,8 @@ Class Character:
             self.estado = self.IDLE 
 
     #desenho do sprite do personagem 
-    def draw_char(self, func):
-        func(self.sprite_id, self.x, self.y, self.largura * escala, self.height * escala, 0.0, 0.0, 1.0, 1.0)
+    def draw_char(self, func, escala):
+        func(self.sprite_id, self.x, self.y, self.width * escala, self.height * escala, 0.0, 0.0, 1.0, 1.0)
                                                                                         #^^^^^^^^^^^^^^^^^^^^
                                                                                         #coordenadas da criação do quadrado
 
