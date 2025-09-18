@@ -17,15 +17,19 @@ def carregar_mapa(caminho_mapa):
 
 pg.init()
 
+personagem_x, personagem_y = 100, 100
+velocidade_personagem= 2
+relogio = pg.time.Clock()
+
 # configura as dimensões da janela e o título
 screen_width, screen_height = 800, 600
-pg.display.set_caption("Demonstração OpenGL")
+pg.display.set_caption("pokemon opengl")
 
 # configura os atributos do OpenGL no Pygame
-pg.display.gl_set_attribute(pg.GL_CONTEXT_MAJOR_VERSION, 2)
-pg.display.gl_set_attribute(pg.GL_CONTEXT_MINOR_VERSION, 1)
-pg.display.gl_set_attribute(pg.GL_DOUBLEBUFFER, 1)
-pg.display.gl_set_attribute(pg.GL_DEPTH_SIZE, 24)
+pg.display.gl_set_attribute(pg.GL_CONTEXT_MAJOR_VERSION, 2)  
+pg.display.gl_set_attribute(pg.GL_CONTEXT_MINOR_VERSION, 1) #ativa a versão 2.1 do opengl
+pg.display.gl_set_attribute(pg.GL_DOUBLEBUFFER, 1)  #ativa o double buffer do opengl
+pg.display.gl_set_attribute(pg.GL_DEPTH_SIZE, 24)  #"profundidade" do z-buffer 
 
 # cria a janela com suporte a OpenGL
 screen = pg.display.set_mode((screen_width, screen_height), pg.OPENGL | pg.DOUBLEBUF)
@@ -33,7 +37,7 @@ screen = pg.display.set_mode((screen_width, screen_height), pg.OPENGL | pg.DOUBL
 # define a projeção ortográfica 
 glMatrixMode(GL_PROJECTION)
 glLoadIdentity()
-glOrtho(0, screen_width, screen_height, 0, -1, 1)
+glOrtho(0, screen_width, screen_height, 0, -1, 1) #cria a matriz ortogonal
 glMatrixMode(GL_MODELVIEW)
 glLoadIdentity()
 
@@ -48,9 +52,7 @@ tileset_id, tileset_largura, tileset_altura = carregar_textura(r"C:\Users\caiol\
 mapa_data = carregar_mapa(r"C:\Users\caiol\Documents\caio\FACULDADE\sistmult\seminario 1ee PARTE 2\seminario-pyopengl\game\assets_\maps\mapa.txt")
 
 # define a posição inicial do personagem e as dimensões de exibição
-personagem_x, personagem_y = 100, 100
-velocidade_personagem= 2
-relogio = pg.time.Clock()
+
 
 
 # loop principal do jogo
@@ -99,4 +101,4 @@ while running:
     relogio.tick(60) #limita os frames para 60 fps
     
 # inicializa o Pygame
-pg.quit()
+pg.quit() 
