@@ -3,23 +3,10 @@ from pygame.locals import *
 from OpenGL.GL import *
 from sprite_renderer import * 
 from character import Character
+from map_generator import *
 
-#variáveis de renderização
 TILE_SIZE = 16
 ESCALA = 2
-
-#função que inicializa o tileset do mapa
-def carregar_mapa(caminho_mapa):
-    mapa = []
-    with open(caminho_mapa, 'r') as f:
-        for linha in f.readlines():
-            mapa.append([int(i) for i in linha.split()])
-    return mapa
-
-mapeamento_tiles = {
-    0: 13,  # ID do tile de grama no tileset
-    1: 14,  # ID do tile de montanha no tileset
-}
 
 #inicialização do pygame
 pg.init()
@@ -51,14 +38,17 @@ glLoadIdentity()
 glEnable(GL_BLEND)
 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-# loading das texturas do personagem e do mapa
-personagem_textura_id, largura_personagem, altura_personagem = carregar_textura(r"C:\Users\caiol\Documents\caio\FACULDADE\sistmult\seminario 1ee PARTE 2\seminario-pyopengl\game\assets_\sprites\red\idle_front.png")
+#carregamento da textura do personagem
+personagem_textura_id, largura_personagem, altura_personagem = carregar_textura(r"C:\Users\caiol\Documents\caio\FACULDADE\sistmult\seminario 1ee PARTE 2\seminario-pyopengl\game\assets_\sprites\ezgif-split\idle_front.png")
 
-tileset_id, tileset_largura, tileset_altura = carregar_textura(r"C:\Users\caiol\Documents\caio\FACULDADE\sistmult\seminario 1ee PARTE 2\seminario-pyopengl\game\assets_\maps\mapa_generico.png")
-mapa_data = carregar_mapa(r"C:\Users\caiol\Documents\caio\FACULDADE\sistmult\seminario 1ee PARTE 2\seminario-pyopengl\game\assets_\maps\mapa.txt")
+#carregamento do mapa e seus dados
+tileset_id, tileset_largura, tileset_altura = carregar_textura(r"C:\Users\caiol\Documents\caio\FACULDADE\sistmult\seminario 1ee PARTE 2\seminario-pyopengl\game\assets_\maps\simple_tileset_32x32_version1.0\tilesheet_basic.png") 
+
+mapatras_data = carregar_mapa(r"C:\Users\caiol\Documents\caio\FACULDADE\sistmult\seminario 1ee PARTE 2\seminario-pyopengl\game\assets_\maps\mapatras.txt")
+mapafrente_data = carregar_mapa(r"C:\Users\caiol\Documents\caio\FACULDADE\sistmult\seminario 1ee PARTE 2\seminario-pyopengl\game\assets_\maps\mapafrente.txt")
 
 #instanciação do personagem
-char = Character(personagem_textura_id, 380, 200, largura_personagem, altura_personagem, velocidade = 16 * ESCALA // 8, tile_size = TILE_SIZE, escala = ESCALA)
+char = Character(personagem_textura_id, 1, 1, largura_personagem, altura_personagem, velocidade = 10 * ESCALA // 8, tile_size = TILE_SIZE, escala = ESCALA)
 
 # loop principal do jogo
 running = True
@@ -70,26 +60,44 @@ while running:
 
     #logica do teclado/movimentação
     teclas = pg.key.get_pressed()
-    char.update_char(teclas)
+    char.update_char(teclas, mapatras_data, UNWAKABLE_TILES)
 
     # renderização OpenGL
     glClear(GL_COLOR_BUFFER_BIT)
 
     #renderização e desenho do mapa
-    for y_tile, linha in enumerate(mapa_data):
+    # Renderização da camada de fundo
+    for y_tile, linha in enumerate(mapatras_data):
         for x_tile, tile_id in enumerate(linha):
-            # calcula as coordenadas do tile no tileset
-            tileset_colunas = tileset_largura // TILE_SIZE
-            tex_x = (tile_id % tileset_colunas) * TILE_SIZE / tileset_largura
-            tex_y = (tile_id // tileset_colunas) * TILE_SIZE / tileset_altura
+            if tile_id != -1: # -1 é o valor para "sem tile"
+                # cálculo das coordenadas do tile no tileset
+                tileset_colunas = tileset_largura // TILE_SIZE
+                tex_x = (tile_id % tileset_colunas) * TILE_SIZE / tileset_largura
+                tex_y = (tile_id // tileset_colunas) * TILE_SIZE / tileset_altura
+                
+                # desenha o tile do fundo
+                desenhar_sprite(tileset_id, 
+                                x_tile * TILE_SIZE * ESCALA, 
+                                y_tile * TILE_SIZE * ESCALA, 
+                                TILE_SIZE * ESCALA, TILE_SIZE * ESCALA,
+                                tex_x, tex_y, TILE_SIZE / tileset_largura, TILE_SIZE / tileset_altura)
 
-            # desenha o tile
-            desenhar_sprite(tileset_id, 
-                            x_tile * TILE_SIZE * ESCALA, 
-                            y_tile * TILE_SIZE * ESCALA, 
-                            TILE_SIZE * ESCALA, TILE_SIZE * ESCALA,
-                            tex_x, tex_y,
-                            TILE_SIZE / tileset_largura, TILE_SIZE / tileset_altura)
+    # Renderização da camada da frente (objetos)
+    for y_tile, linha in enumerate(mapafrente_data):
+        for x_tile, tile_id in enumerate(linha):
+            if tile_id != -1:
+                # cálculo das coordenadas do tile no tileset
+                tileset_colunas = tileset_largura // TILE_SIZE
+                tex_x = (tile_id % tileset_colunas) * TILE_SIZE / tileset_largura
+                tex_y = (tile_id // tileset_colunas) * TILE_SIZE / tileset_altura
+
+                # desenha o tile da frente
+                desenhar_sprite(tileset_id, 
+                                x_tile * TILE_SIZE * ESCALA, 
+                                y_tile * TILE_SIZE * ESCALA, 
+                                TILE_SIZE * ESCALA, TILE_SIZE * ESCALA,
+                                tex_x, tex_y, TILE_SIZE / tileset_largura, TILE_SIZE / tileset_altura)
+    
         
     # desenha o personagem
     char.draw_char(desenhar_sprite, ESCALA)
