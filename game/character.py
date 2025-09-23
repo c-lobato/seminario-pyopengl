@@ -1,5 +1,6 @@
 import pygame as pg
 from sprite_renderer import *
+from map_generator import TILE_SIZE, ESCALA, is_tile_walkable
 
 class Character: 
     def __init__(self, sprite_id, x,y, width, height, velocidade, tile_size, escala):
@@ -18,31 +19,32 @@ class Character:
         self.target_x = self.x
         self.target_y = self.y 
     
-    #movimentação do personagem + atualização de posicionamento no tileset
-    def update_char(self, teclas, mapatras, unwalkable_tiles):
-        if self.estado == self.IDLE:
-            if teclas[pg.K_w]:
-                self.target_y -= self.tile_size * self.escala
-                self.estado = self.MOVING
-            elif teclas[pg.K_s]:
-                self.target_y += self.tile_size * self.escala
-                self.estado = self.MOVING
-            elif teclas[pg.K_a]:
-                self.target_x -= self.tile_size * self.escala
-                self.estado = self.MOVING
-            elif teclas[pg.K_d]:
-                self.target_x += self.tile_size * self.escala
-                self.estado = self.MOVING
-            
+    def _try_move(self, new_x, new_y, mapa_dados):
+        if self.estado == self.IDLE and is_tile_walkable(new_x, new_y, mapa_dados):
+            self.target_x = new_x
+            self.target_y = new_y
+            self.estado = self.MOVING
+
+    def update_char(self, teclas, mapa_dados):
+        # lógica de movimento 
+        if teclas[pg.K_w]:
+            self._try_move(self.x, self.y - self.tile_size * self.escala, mapa_dados)
+        elif teclas[pg.K_s]:
+            self._try_move(self.x, self.y + self.tile_size * self.escala, mapa_dados)
+        elif teclas[pg.K_a]:
+            self._try_move(self.x - self.tile_size * self.escala, self.y, mapa_dados)
+        elif teclas[pg.K_d]:
+            self._try_move(self.x + self.tile_size * self.escala, self.y, mapa_dados)
+
         #logica de chegada/destino (aumento/diminuição de velocidade)
         elif self.estado == self.MOVING:
             if self.x < self.target_x:
                 self.x += self.velocidade
-            if self.x > self.target_x:
+            elif self.x > self.target_x:
                 self.x -= self.velocidade
-            if self.y < self.target_y:
+            elif self.y < self.target_y:
                 self.y += self.velocidade
-            if self.y > self.target_y:
+            elif self.y > self.target_y:
                 self.y -= self.velocidade       
 
         #verificação de destino  
@@ -60,5 +62,3 @@ class Character:
         func(self.sprite_id, self.x, ajuste_y, self.width * escala, self.height * escala, 0.0, 0.0, 1.0, 1.0)
                                                                                         #^^^^^^^^^^^^^^^^^^^^
                                                                                         #coordenadas da criação do quadrado
-
-
