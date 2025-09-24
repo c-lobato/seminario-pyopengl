@@ -5,9 +5,6 @@ from sprite_renderer import *
 from character import Character
 from map_generator import *
 
-TILE_SIZE = 16
-ESCALA = 2
-
 #inicialização do pygame
 pg.init()
 
@@ -15,8 +12,8 @@ pg.init()
 relogio = pg.time.Clock()
 
 # configura as dimensões da janela e o título
-screen_width, screen_height = 700, 600
-pg.display.set_caption("pokemon opengl")
+screen_width, screen_height = 600, 600
+pg.display.set_caption("pokemon paraguaio com opengl")
 
 # configura os atributos do OpenGL no Pygame
 pg.display.gl_set_attribute(pg.GL_CONTEXT_MAJOR_VERSION, 2)  
@@ -43,9 +40,7 @@ personagem_textura_id, largura_personagem, altura_personagem = carregar_textura(
 
 #carregamento do mapa e seus dados
 tileset_id, tileset_largura, tileset_altura = carregar_textura(r"C:\Users\caiol\Documents\caio\FACULDADE\sistmult\seminario 1ee PARTE 2\seminario-pyopengl\game\assets_\maps\simple_tileset_32x32_version1.0\tilesheet_basic.png") 
-
-mapatras_data = carregar_mapa(r"C:\Users\caiol\Documents\caio\FACULDADE\sistmult\seminario 1ee PARTE 2\seminario-pyopengl\game\assets_\maps\mapatras.txt")
-mapafrente_data = carregar_mapa(r"C:\Users\caiol\Documents\caio\FACULDADE\sistmult\seminario 1ee PARTE 2\seminario-pyopengl\game\assets_\maps\mapafrente.txt")
+mapa_dados = carregar_mapa(r"C:\Users\caiol\Documents\caio\FACULDADE\sistmult\seminario 1ee PARTE 2\seminario-pyopengl\game\assets_\maps\mapatras.txt")
 
 #instanciação do personagem
 char = Character(personagem_textura_id, 1, 1, largura_personagem, altura_personagem, velocidade = 10 * ESCALA // 8, tile_size = TILE_SIZE, escala = ESCALA)
@@ -60,14 +55,14 @@ while running:
 
     #logica do teclado/movimentação
     teclas = pg.key.get_pressed()
-    char.update_char(teclas, mapatras_data, UNWAKABLE_TILES)
+    char.update_char(teclas) #chamada da atualização da posição do char
 
     # renderização OpenGL
     glClear(GL_COLOR_BUFFER_BIT)
 
     #renderização e desenho do mapa
     # Renderização da camada de fundo
-    for y_tile, linha in enumerate(mapatras_data):
+    for y_tile, linha in enumerate(mapa_dados):
         for x_tile, tile_id in enumerate(linha):
             if tile_id != -1: # -1 é o valor para "sem tile"
                 # cálculo das coordenadas do tile no tileset
@@ -76,22 +71,6 @@ while running:
                 tex_y = (tile_id // tileset_colunas) * TILE_SIZE / tileset_altura
                 
                 # desenha o tile do fundo
-                desenhar_sprite(tileset_id, 
-                                x_tile * TILE_SIZE * ESCALA, 
-                                y_tile * TILE_SIZE * ESCALA, 
-                                TILE_SIZE * ESCALA, TILE_SIZE * ESCALA,
-                                tex_x, tex_y, TILE_SIZE / tileset_largura, TILE_SIZE / tileset_altura)
-
-    # Renderização da camada da frente (objetos)
-    for y_tile, linha in enumerate(mapafrente_data):
-        for x_tile, tile_id in enumerate(linha):
-            if tile_id != -1:
-                # cálculo das coordenadas do tile no tileset
-                tileset_colunas = tileset_largura // TILE_SIZE
-                tex_x = (tile_id % tileset_colunas) * TILE_SIZE / tileset_largura
-                tex_y = (tile_id // tileset_colunas) * TILE_SIZE / tileset_altura
-
-                # desenha o tile da frente
                 desenhar_sprite(tileset_id, 
                                 x_tile * TILE_SIZE * ESCALA, 
                                 y_tile * TILE_SIZE * ESCALA, 

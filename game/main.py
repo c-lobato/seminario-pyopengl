@@ -55,7 +55,7 @@ while running:
 
     #logica do teclado/movimentação
     teclas = pg.key.get_pressed()
-    char.update_char(teclas, mapa_dados) #chamada da atualização da posição do char
+    char.update_char(self, teclas) #chamada da atualização da posição do char
 
     # renderização OpenGL
     glClear(GL_COLOR_BUFFER_BIT)
